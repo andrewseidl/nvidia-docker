@@ -1,6 +1,6 @@
-FROM ubuntu:14.04
+FROM ppc64le/ubuntu:16.04
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends --force-yes \
         vim-nox \
         dh-make \
         dh-systemd \
@@ -15,16 +15,18 @@ ARG CR_EMAIL
 ARG PKG_NAME
 ARG PKG_VERS
 ARG PKG_REV
+# Unused but kept for consistency with x86
 ARG PKG_ARCH
 
 VOLUME /dist
-VOLUME /build
+VOLUME /buil
 WORKDIR /tmp/$PKG_NAME-$PKG_VERS
 
 ENV DEBFULLNAME $CR_NAME
 ENV DEBEMAIL $CR_EMAIL
 ENV REVISION $PKG_VERS-$PKG_REV
-ENV ARCHITECTURE $PKG_ARCH
+# Hard-coded since ppc64le doesn't have the issue of amd64 vs x86_64.
+ENV ARCHITECTURE ppc64el
 
 RUN useradd --non-unique --uid $USER_ID nvidia && chown nvidia: .
 USER nvidia

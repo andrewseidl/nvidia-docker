@@ -23,6 +23,15 @@ BUILD_DIR  := $(CURDIR)/build
 DOCKER_BIN := $(BIN_DIR)/nvidia-docker
 PLUGIN_BIN := $(BIN_DIR)/nvidia-docker-plugin
 
+# Mirror the BUILD_ARCH from the build Dockerfile
+BUILD_ARCH = .$(shell uname -m)
+ifneq ($(BUILD_ARCH),.ppc64le)
+    BUILD_ARCH =
+else
+    PKG_ARCH = $(BUILD_ARCH)
+endif
+
+
 DOCKER_VERS      := $(shell $(NV_DOCKER) version -f '{{.Client.Version}}')
 DOCKER_VERS_MAJ  := $(shell echo $(DOCKER_VERS) | cut -d. -f1)
 DOCKER_VERS_MIN  := $(shell echo $(DOCKER_VERS) | cut -d. -f2)

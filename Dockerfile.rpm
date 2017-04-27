@@ -1,9 +1,26 @@
-FROM centos:7
+FROM ppc64le/centos:7.3
 
-RUN yum install -y \
-        vim \
-        rpm-build && \
-    rm -rf /var/cache/yum/*
+MAINTAINER Junli Zhang <junlizh@cn.ibm.com>
+
+RUN \
+  rm -f /etc/yum.repos.d/CentOS-* && \
+  > /etc/yum.repos.d/os.repo && \
+  echo "[os]"                                                 >> /etc/yum.repos.d/os.repo && \
+  echo "name=os"                                              >> /etc/yum.repos.d/os.repo && \
+  echo "baseurl=ftp://172.16.15.29/os/centos/os/ppc64le"      >> /etc/yum.repos.d/os.repo && \
+  echo "enabled=1"                                            >> /etc/yum.repos.d/os.repo && \
+  echo "gpgcheck=0"                                           >> /etc/yum.repos.d/os.repo && \
+  echo ""                                                     >> /etc/yum.repos.d/os.repo && \
+  echo "[updates]"                                            >> /etc/yum.repos.d/os.repo && \
+  echo "name=updates"                                         >> /etc/yum.repos.d/os.repo && \
+  echo "baseurl=ftp://172.16.15.29/os/centos/updates/ppc64le" >> /etc/yum.repos.d/os.repo && \
+  echo "enabled=1"                                            >> /etc/yum.repos.d/os.repo && \
+  echo "gpgcheck=0"                                           >> /etc/yum.repos.d/os.repo && \
+  yum -y update && \
+  yum -y install \
+    vim \
+    rpm-build && \
+  rm -rf /var/cache/yum/* 
 
 RUN sed -i 's/include_release_info = 1/include_release_info = 0/' /usr/share/vim/vim74/ftplugin/spec.vim && \
     echo 'let g:spec_chglog_format = "%a %b %d %Y ".$VENDOR." <".$EMAIL."> ".$VERSION."-".$REVISION' >> /etc/vimrc && \
@@ -26,7 +43,8 @@ ENV EMAIL $CR_EMAIL
 ENV NAME $PKG_NAME
 ENV VERSION $PKG_VERS
 ENV REVISION $PKG_REV
-ENV ARCHITECTURE $PKG_ARCH
+#ENV ARCHITECTURE $PKG_ARCH
+ENV ARCHITECTURE ppc64le
 
 RUN useradd --non-unique --uid $USER_ID nvidia && chown nvidia: .
 USER nvidia
@@ -40,8 +58,8 @@ CMD read -p "Update changelog (y/n)? " yn && [ "$yn" = "y" ] && \
              -D "vendor $VENDOR" \
              -D "email $EMAIL" \
              -D "name $NAME" \
+             -D "architecture $ARCHITECTURE" \
              -D "version $VERSION" \
              -D "revision $REVISION" \
-             -D "architecture $ARCHITECTURE" \
              SPECS/$NAME.spec && \
     mv RPMS/$ARCHITECTURE/*.rpm /dist

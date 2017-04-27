@@ -2,6 +2,7 @@ Name: %{name}
 Version: %{version}
 Release: %{revision}
 BuildArch: %{architecture}
+#BuildArch: ppc64le
 Group: Development Tools
 
 Vendor: %{vendor}
@@ -11,7 +12,8 @@ Summary: NVIDIA Docker container tools
 URL: https://github.com/NVIDIA/nvidia-docker
 License: BSD
 
-Source0: %{name}_%{version}_%{architecture}.tar.xz
+Source0: %{name}_%{version}_.%{architecture}.tar.xz
+#Source0: %{name}_%{version}_.ppc64le.tar.xz
 Source1: %{name}.service
 Source2: LICENSE
 
